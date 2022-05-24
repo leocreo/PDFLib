@@ -166,7 +166,16 @@ class PDFLib
         return $this->number_of_pages;
     }
 
-
+    public function getPagesDimensions()
+    {
+        if ($this->gs_command == "gswin32c.exe" || $this->gs_command == "gswin64c.exe") {
+            $this->pdf_path = str_replace('\\', '/', $this->pdf_path);
+        }
+        $pages = $this->executeGS('-dQUIET --permit-file-read="'.$this->pdf_path.'" -sFileName="'.$this->pdf_path.'" -c "FileName (r) file runpdfbegin 1 1 pdfpagecount {pdfgetpage /MediaBox get {=print ( ) print} forall (\n) print} for quit"', true);
+        $pages = explode("\n", $pages);
+        array_pop($pages);
+        return $pages;
+    }
 
     public function convert()
     {
